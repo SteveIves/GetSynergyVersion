@@ -4,7 +4,7 @@ import System.Diagnostics
 import System.IO
 import Microsoft.Win32
 
-namespace GetFileVersion
+namespace GetSynergyVersion
 
     ;;; <summary>
     ;;; Report the installed version of Synergy/DE.
