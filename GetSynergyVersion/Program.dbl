@@ -1,0 +1,49 @@
+
+import System
+import System.Diagnostics
+import System.IO
+import Microsoft.Win32
+
+namespace GetFileVersion
+
+    ;;; <summary>
+    ;;; Report the installed version of Synergy/DE.
+    ;;; IMPORTANT: For the registry code to work correctly, build this .NET Console application for 64-bit
+    ;;; </summary>
+    main
+    proc
+        Console.WriteLine("32-bit Synergy: " + VersionTools.GetSynergy32Version())
+        Console.WriteLine("64-bit Synergy: " + VersionTools.GetSynergy64Version())
+    endmain
+
+    public static class VersionTools
+
+        private static patchLetters, [#]string, new string[#] {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"}
+
+        public static method GetSynergy32Version, string
+        proc
+            mreturn GetSynergyVersion(Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Synergex\Install","SDELOC",""))
+        endmethod
+
+        public static method GetSynergy64Version, string
+        proc
+            mreturn GetSynergyVersion(Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Synergex\Install","SDELOC",""))
+        endmethod
+
+        private static method GetSynergyVersion, string
+            required in sdeLocation, @object
+        proc    
+            if (sdeLocation==^null) then
+            begin
+                mreturn "Not installed!"
+            end
+            else
+            begin
+                data dbrpath = Path.Combine(sdeLocation.ToString(),"dbl\bin\dbr.exe")
+                data fvi = FileVersionInfo.GetVersionInfo(dbrpath)
+                mreturn String.Format("{0}.{1}.{2}{3}",fvi.ProductMajorPart,fvi.ProductMinorPart,fvi.ProductBuildPart,patchLetters[fvi.ProductPrivatePart])
+            end
+        endmethod
+    endclass
+
+endnamespace
